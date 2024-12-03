@@ -16,10 +16,10 @@ static MUL_RE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"mul\((\d+),(\d+)\)").unwrap()
 });
 static DO_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"do()").unwrap()
+    Regex::new(r"do\(\)").unwrap()
 });
 static DONT_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"don't()").unwrap()
+    Regex::new(r"don\'t\(\)").unwrap()
 });
 
 impl Solution {
@@ -41,21 +41,21 @@ impl Solution {
             .sum()
     }
 
-    fn part2(&mut self) {
+    fn part2(&mut self) -> T{
         let do_indices: BTreeSet<_> = DO_RE.find_iter(&self.input).map(|x| x.end()).collect();
         let dont_indices: BTreeSet<_> = DONT_RE.find_iter(&self.input).map(|x| x.end()).collect();
 
-        let res = 0;
+        let mut res = 0;
         for m in MUL_RE.captures_iter(&self.input) {
             let start = m.get(0).unwrap().start();
-            let closest_do = do_indices.range(0..start).next_back().unwrap_or(&1);
-            let closest_dont = dont_indices.range(0..start).next_back().unwrap_or(&0);
-            println!("Closest do: {:?}", closest_do);
-            println!("closest_dont do: {:?}", closest_dont);
+            let closest_do = do_indices.range(0..=start).next_back().unwrap_or(&0);
+            let closest_dont = dont_indices.range(0..=start).next_back().unwrap_or(&0);
+            if closest_do >= closest_dont {
+                res += m.get(1).unwrap().as_str().parse::<T>().unwrap() * m.get(2).unwrap().as_str().parse::<T>().unwrap();
+            }
         }
 
-        println!("Do  : {:?}", do_indices);
-        println!("Dont: {:?}", dont_indices);
+        res
     }
 
     pub fn solve(&mut self) {
