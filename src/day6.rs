@@ -1,26 +1,48 @@
+use std::collections::HashSet;
 use std::fs::read_to_string;
 use std::io::{self, Write};
 
 #[allow(unused_imports)]
 use itertools::Itertools;
 
+type T = i32;
 pub struct Solution {
-    lines: Vec<String>,
+    blocked: HashSet<(T, T)>
+    start_pos: (T, T),
+}
+
+pub enum Direction { Up, Down, Left, Right }
+impl Direction {
+    pub fn to_delta(&self) -> (T, T) {
+        match &self {
+            Direction::Up => 
+        }
+    }
 }
 
 impl Solution {
     pub fn init() -> Self {
-        let mut lines = Vec::new();
-        for line in read_to_string("inputs/day6.txt").unwrap().lines() {
-            lines.push(line.to_string());
+        let mut blocked = HashSet::new();
+        let mut start_pos = None;
+        for (y, line) in read_to_string("inputs/day6.txt").unwrap().lines().enumerate() {
+            for (x, c) in line.chars().enumerate() {
+                if c == '#' {
+                    blocked.insert((x as T, y as T));
+                } else if c == '^' {
+                    start_pos = Some((x as T, y as T));
+                }
+            }
         }
 
         Self {
-            lines,
+            blocked,
+            start_pos: start_pos.unwrap(),
         }
     }
 
     fn part1(&mut self) {
+        let mut pos = self.start_pos.clone();
+        let mut direction = Direction::UP;
 
     }
 
