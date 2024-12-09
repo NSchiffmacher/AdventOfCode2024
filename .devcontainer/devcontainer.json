@@ -3,13 +3,14 @@
     "customizations": {
         "vscode": {
             "extensions": [
-                "cschleiden.vscode-github-actions",
-                "ms-vsliveshare.vsliveshare",
-                "matklad.rust-analyzer",
-                "fill-labs.dependi",
-                "vadimcn.vscode-lldb",
-                "monokai.theme-monokai-pro-vscode"
-            ]
+				"cschleiden.vscode-github-actions",
+				"ms-vsliveshare.vsliveshare",
+				"matklad.rust-analyzer",
+				"fill-labs.dependi",
+				"vadimcn.vscode-lldb",
+				"monokai.theme-monokai-pro-vscode",
+				"rust-lang.rust-analyzer"
+			]
         }
     },
     "postCreateCommand": "chmod +x .devcontainer/setup.sh; sudo .devcontainer/setup.sh"
