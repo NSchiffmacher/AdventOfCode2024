@@ -1,0 +1,15 @@
+{
+	"name": "Codespaces Rust Starter",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "cschleiden.vscode-github-actions",
+                "ms-vsliveshare.vsliveshare",
+                "matklad.rust-analyzer",
+                "serayuzgur.crates",
+                "vadimcn.vscode-lldb"
+            ]
+        }
+    },
+    "postCreateCommand": "chmod +x .devcontainer/setup.sh; sudo .devcontainer/setup.sh"
+}
