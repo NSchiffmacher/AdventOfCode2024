@@ -6,7 +6,7 @@
                 "cschleiden.vscode-github-actions",
                 "ms-vsliveshare.vsliveshare",
                 "matklad.rust-analyzer",
-                "serayuzgur.crates",
+                "fill-labs.dependi",
                 "vadimcn.vscode-lldb"
             ]
         }
