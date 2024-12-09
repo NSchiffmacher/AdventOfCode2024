@@ -71,6 +71,20 @@ impl Solution {
         None
     }
 
+    fn print_occupied(used_memory: &Vec<(T, T)>) -> String {
+        let max_size = used_memory.iter().map(|(_ad, size)| size).max().unwrap();
+        let max_ad = used_memory.iter().map(|(ad, _size)| ad).max().unwrap();
+        let mut res = vec!['.'; (*max_ad + *max_size) as usize];
+
+        for (id, (ad, size)) in used_memory.iter().enumerate() {
+            for offset in 0..*size {
+                res[(*ad + offset) as usize] = id.to_string().chars().next().unwrap();
+            }
+        }
+
+        res.iter().collect()
+    }
+
     fn part2(&mut self) -> T {
         // Parsing
         let mut free_spaces = BTreeMap::new(); // Map of index -> given size
@@ -89,31 +103,30 @@ impl Solution {
 
         // Moving the blocks by order of id
         for id in (0..used_memory.len()).rev() {
-        for (address, size) in used_memory.iter_mut().rev() {
+            let (address, size) = used_memory[id];
             // Find the first place where the block can fit
-            if let Some((available_spot, spot_size)) = Self::find_spot(&free_spaces, *size) {
-                let old_address = *address;
-                *address = available_spot;
+            if let Some((available_spot, spot_size)) = Self::find_spot(&free_spaces, size) {
+                if available_spot < address {
+                    // Delete the spot from the available spots
+                    free_spaces.remove(&available_spot).unwrap();
+                    if spot_size >= size {
+                        // Need to break the available spot in two
+                        free_spaces.insert(available_spot + size, spot_size - size);
+                    }
 
-                // Delete the spot from the available spots
-                free_spaces.remove(&available_spot).unwrap();
-                if spot_size >= *size {
-                    // Need to break the available spot in two
-                    free_spaces.insert(available_spot + *size, spot_size - *size);
+                    // Add a free spot at the old address
+                    let free_spot_size = if let Some(add_size)  = free_spaces.remove(&(address + size)) {
+                        size + add_size
+                    } else {
+                        size
+                    };
+
+                    free_spaces.insert(address, free_spot_size);
+
+                    // Update the new address
+                    used_memory[id] = (available_spot, size);
                 }
-
-                // Add a free spot at the old address
-                let free_spot_size = if let Some(add_size)  = free_spaces.remove(&(old_address + *size)) {
-                    *size + add_size
-                } else {
-                    *size
-                };
-
-                free_spaces.insert(old_address, free_spot_size);
-            } else {
-                println!("No move ?");
             }
-            println!("{:?}", used_memory);
         }
 
         // Compute the checksum
