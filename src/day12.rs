@@ -8,6 +8,8 @@ use itertools::Itertools;
 type Id = usize;
 type Coord = isize;
 
+// 859336 to low
+
 pub struct Solution {
     raw_map: Vec<Vec<char>>,
     map: Vec<Vec<Id>>,
@@ -100,6 +102,7 @@ impl Solution {
             let base_pos = to_visit.iter().next().unwrap().clone();
             to_visit.remove(&base_pos);
 
+            // Regions detection
             let mut queue = vec![base_pos];
             let mut region = vec![base_pos];
             let region_char = self.raw_map[base_pos.1 as usize][base_pos.0 as usize];
@@ -122,32 +125,67 @@ impl Solution {
         // println!("{:?}", self.raw_map);
         // println!("{:?}", self.map);
 
+        // Result computation
         let mut result = 0;
         for (id, region) in regions.into_iter().enumerate() {
             let area = region.len();
-            let mut edge = HashSet::new();
-            for (x, y) in region.clone() { // debug
-                let mut is_in = true;
-                for (nx, ny) in [(x+1, y), (x-1, y), (x, y+1), (x, y-1)] {
-                    if !(nx < 0 || nx >= self.width || ny < 0 || ny >= self.height || self.map[ny as usize][nx as usize] != id) {
-                        is_in = false;
-                    }
-                }
 
-                if !is_in {
-                    edge.insert((x, y));
+            // Construct the outside edge
+            let mut outside_edge: HashSet<(isize, isize)> = HashSet::new();
+            for (x, y) in region.clone() { // debug
+                for (dx, dy) in [(1, 0), (-1, 0), (0, 1), (0, -1)] { //  (1, -1), (-1, 1), (1, -1), (1, 1)
+                    let (nx, ny) = (x+dx, y+dy);
+                    if nx < 0 || nx >= self.width || ny < 0 || ny >= self.height || self.map[ny as usize][nx as usize] != id {
+                        let (xb, yb) = (2*x+1, 2*y+1); // x, y in "big" grid
+                        for i in -1..=1 {
+                            let nxb = xb + i * dy + dx;
+                            let nyb = yb + i * dx + dy;
+
+                            outside_edge.insert((nxb, nyb));
+                        }
+                    }
                 }
             }
 
-            // Count the number of sides
-            // Traverse in one direction 
-            // Bordel
 
-            // let first = region[0];
-            // let c = self.raw_map[first.1 as usize][first.0 as usize];
-            // println!("Char: {:?} Region: {:?} Area: {:?} edge {:?}", c, region, area, edge);
+            // Count the number of corners, result = corners.len() ?
+            // let mut corners = HashSet::new();
+            let mut sides = 0;
+            let mut corners = HashSet::new();
+            for (x, y) in outside_edge.iter().cloned() {
+                // Find all neighbor
+                let mut deltas = vec![];
+                for (nx, ny) in [(x+1, y), (x-1, y), (x, y+1), (x, y-1)] {
+                    if outside_edge.contains(&(nx, ny)) {
+                        deltas.push((x - nx, y - ny));
+                    }
+                }
 
-            result += 1 * area;
+                
+                if deltas.len() == 2 {
+                    let a = deltas[0];
+                    let b = deltas[1];
+                    let neg_b = (-b.0, -b.1);
+                    if a != neg_b {
+                        // Not in a straighline => Corner? 
+                        corners.insert((x, y));
+                        sides += 1; 
+                        // }
+                    }
+                } else if deltas.len() == 4 {
+                    corners.insert((x, y));
+                    sides += 2; 
+                } else  {
+                    println!("({}, {}) -> {:?}", x, y, deltas);
+                    panic!("Possible ???");
+                }
+            }
+
+            let first = region[0];
+            let c = self.raw_map[first.1 as usize][first.0 as usize];
+            println!("Char: {:?} Region: {:?} Area: {:?} sides {:?}/{}", c, 'X', area, corners.len(), sides);
+
+            result += sides * area;
         }
         result
     }
