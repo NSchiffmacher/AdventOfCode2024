@@ -1,4 +1,18 @@
-Button A: X+92, Y+17
+import re
+
+def part1(puzzle_input):
+    total = 0
+    tolerance = 0.0001
+    for machine in puzzle_input.split('\n\n'):
+        ax, ay, bx, by, x, y = map(int, re.findall(r'(\d+)', machine))
+        A = (bx*y - by*x) / (bx*ay - by*ax)
+        B = (x-ax*A) / bx
+        if abs(A - round(A)) < tolerance and abs(B - round(B)) < tolerance:
+            total += 3*A + B
+
+    return int(total)
+
+print(part1('''Button A: X+92, Y+17
 Button B: X+27, Y+61
 Prize: X=9152, Y=6172
 
@@ -1277,3 +1291,4 @@ Prize: X=11305, Y=8893
 Button A: X+13, Y+45
 Button B: X+52, Y+46
 Prize: X=5395, Y=5811
+'''))
