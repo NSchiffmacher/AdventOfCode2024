@@ -1,4 +1,3 @@
-use std::collections::HashSet;
 use std::fs::read_to_string;
 use std::io::{self, Write};
 use regex::Regex;
